@@ -56,7 +56,8 @@ public:
 
 };
 
-
+void insert();
+void print();
 void fromFile();
 void fromClient();
 
@@ -128,5 +129,23 @@ void fromFile()
 
 void fromClient()
 {
-  
+  int inp;
+  cout << "Enter numbers one by one, entering 0 will exit the loop." << endl;
+  int loopCount = 0;
+  while(inp != 0 || loopCount < 50)
+  {
+    cin >> inp;
+    insert(root, inp);
+    cout << endl;
+    loopCount++;
+  }
+}
+
+void insert()
+{
+
+}
+void print()
+{
+
 }
