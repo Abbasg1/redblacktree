@@ -60,12 +60,16 @@ void insert();
 void print();
 void fromFile();
 void fromClient();
+//need global vriable
+Node* root = nullptr;
+
+
 
 int main()
 {
 
-  boolean initRun = true;
-  while(initRun)
+  //loop for initial creation of tree
+  while(true)
   {
     int cmd;
     cout << "select input, Enter 1 for File or 2 for Manual";
@@ -73,19 +77,19 @@ int main()
     if(cmd == 1)
     {
       cout << "selected: F" << endl;
-      initRun = false;
+      break;
     }
     else if(cmd == 2)
     {
       cout << "selected: M" << endl;
-      initRun = false;
+      break;
     }
     else
     {
       cout << "error in cmd" << endl;
     }
   }
-
+  print(root,0);
   while(true)
   {
     int rsp;
@@ -93,11 +97,17 @@ int main()
     cin >> rsp;
     if(rsp == 1)
     {//insert
+      int num;
+      cout << "Enter a number to insert" << endl;
+      cin>> num;
+      cin.get();
+      insert(root, num);
+      cout << "insert function called" << endl;
 
     }
     else if(rsp == 2)
     {//print
-
+      print(root, 0);
     }
     else if(rsp ==3)
     {//quit
@@ -105,7 +115,7 @@ int main()
     }
     else
     {
-
+      cout << "Invalid command";
     }
 
   }
