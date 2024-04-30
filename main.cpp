@@ -56,10 +56,18 @@ public:
 
 };
 
-void insert();
-void print();
+void insert(Node*& c, int num);
+void print(Node* c, int h);
 void fromFile();
 void fromClient();
+
+void reColor(Node*& c);
+void checkCases(Node*& c);
+void rightRedU(Node*& c);
+void leftRedU(Node*& c);
+
+Node* rightRotate(Node* n);
+Node* leftRotate (Node* n);
 //need global vriable
 Node* root = nullptr;
 
@@ -151,11 +159,70 @@ void fromClient()
   }
 }
 
-void insert()
+void insert(Node*& c, int num)
+{
+  //first check if curr is null
+  if (c == NULL) 
+  {
+    c = new Node(num, NULL, NULL, NULL, false);
+    root = c;
+    return;
+  }
+  //check that the addition is >= curr
+  if (num >= c->data) 
+  {
+    if (c->right == NULL) 
+    {
+      c->right = new Node(num, NULL, NULL, c, true);
+      checkCases(c->right);
+      return;
+    }
+    else 
+    {
+      insert(c->right, num);
+    }
+  }
+  //check less than curr
+  else 
+  {
+    if (c->left == NULL) 
+    {
+      c->left = new Node(num, NULL, NULL, c, true);
+      checkCases(c->left);
+      return;
+    }
+    else 
+    {
+      insert(c->left, num);
+    }
+  }
+}
+void print(Node* c, int h)
 {
 
 }
-void print()
+void reColor(Node*& c)
+{
+
+}
+void checkCases(Node*& c)
+{
+
+}
+void rightRedU(Node*& c)
+{
+
+}
+void leftRedU(Node*& c)
+{
+
+}
+
+Node* rightRotate(Node* n)
+{
+
+}
+Node* leftRotate (Node* n)
 {
 
 }
