@@ -20,9 +20,12 @@ https://www.programiz.com/dsa/red-black-tree
 https://youtu.be/jNyTK_2CLPU
 +
 Professor Fant's video lectures
++
+https://www.cs.usfca.edu/~galles/visualization/RedBlack.html
+for testing
 */
 
-class Node
+class Node //node class
 {
 public:
   int data;
@@ -56,6 +59,7 @@ public:
 
 };
 
+//fucntion prototpes, c is current h is height
 void insert(Node*& c, int num);
 void print(Node* c, int h);
 void fromFile();
@@ -66,13 +70,70 @@ void checkCases(Node*& c);
 void rightRedU(Node*& c);
 void leftRedU(Node*& c);
 
-Node* rightRotate(Node* n);
-Node* leftRotate (Node* n);
-//need global vriable
+
+//need global vriable for be;ow
 Node* root = nullptr;
 
+Node* rightRotate(Node* n)
+{
+
+  Node* lNode = n->left;
+  n->left = lNode->right;
+  if (lNode->right != NULL) 
+  {
+    //child right not null
+    lNode->right->parent = n;
+  }
+  lNode->right = n;
+  lNode->parent = n->parent;
+  //node rotates t root
+  if (n->parent == NULL) 
+  {
+    root = lNode;
+  }
+  else if (n == n->parent->left) 
+  {
+    //node be left child
+    n->parent->left = lNode;
+  }
+  else 
+  {
+    //node be right child
+    n->parent->right = lNode;
+  }
+  n->parent = lNode;
+  return lNode;
+}
+Node* leftRotate (Node* n)
+{//identical ^
+  Node* rNode = n->right;
+  n->right = rNode->left;
+  if (rNode->left != NULL) 
+  {
+    rNode->left->parent = n;
+  }
+  rNode->left = n;
+  rNode->parent = n->parent;
+  if (n->parent == NULL) 
+  { 
+    root = rNode;
+  }
+  else if (n == n->parent->left) 
+  { 
+    n->parent->left = rNode;
+  }
+  else 
+  {
+    n->parent->right = rNode;
+  }
+  n->parent = rNode;
+  return rNode;
+
+}
 
 
+
+//driver code
 int main()
 {
 
@@ -85,11 +146,13 @@ int main()
     if(cmd == 1)
     {
       cout << "selected: F" << endl;
+      fromFile();
       break;
     }
     else if(cmd == 2)
     {
       cout << "selected: M" << endl;
+      fromClient();
       break;
     }
     else
@@ -137,8 +200,8 @@ void fromFile()
   srand(time(NULL));
 
   int n;
-  
-  while(!numbers.eof())
+  int c=0;
+  while(c <51 && !numbers.eof())
   {
     numbers >> n;
     insert(root, n);
@@ -149,14 +212,25 @@ void fromClient()
 {
   int inp;
   cout << "Enter numbers one by one, entering 0 will exit the loop." << endl;
+  
+  //it was inserting 0 before checking if it would satisfy the loop condition i think
+
+
   int loopCount = 0;
-  while(inp != 0 || loopCount < 50)
+  do
   {
+    
     cin >> inp;
-    insert(root, inp);
-    cout << endl;
-    loopCount++;
-  }
+    if(inp != 0)
+    {  
+      insert(root, inp);
+      cout << endl;
+      loopCount++;
+    }
+  } 
+  while(loopCount <50);
+  
+  
 }
 
 void insert(Node*& c, int num)
@@ -198,31 +272,114 @@ void insert(Node*& c, int num)
   }
 }
 void print(Node* c, int h)
-{
-
+{ 
+  if (c == nullptr) 
+  {
+    return;
+  }
+  print(c->right, h + 1);// Recursively print right subtree while incrementing h
+  for (int i = 0; i < h; i++) 
+  {
+    cout << "\t"; //visualizer
+  }
+  if(c->color)
+  {
+    cout << c->data << "r" << endl; //printing data/color
+  }
+  else//else color is fale (black
+  {
+    cout << c->data << "b" << endl;
+  }
+  print(c->left, h + 1);
 }
 void reColor(Node*& c)
-{
-
+{//check if the value of "c" color is red, change to black. else opposite.
+  if (c->color) 
+  {
+    c->color = false;
+  }
+  else 
+  {
+    c->color = true;
+  }
 }
 void checkCases(Node*& c)
-{
-
+{//recursively check balance maintain rbt properties after inserting c new npde
+  if (c == NULL || c->parent == NULL || c->parent->parent == NULL) 
+  {//if c, c's parent, and c's grandparent dont exist
+    return;
+  }
+  Node* grandparent = c->parent->parent; //ease of access
+  if (grandparent->right == c->parent) 
+  {//right parent
+    Node* uncle = grandparent->left;
+    if ((uncle != NULL) && (uncle->color == true)) 
+    {//red uncle
+      rightRedU(c);
+      checkCases(grandparent);
+    }
+    else if (((uncle == NULL) || (uncle->color == false)) && c->parent->color == true) 
+    {//black uncle case
+      if (c->parent->left == c) 
+      {
+        Node * temp = rightRotate(c->parent);
+        checkCases(temp->right);
+      }
+      else
+      {
+        reColor(c->parent);
+        reColor(grandparent);
+        Node* temp = leftRotate(c->parent->parent);
+        checkCases(grandparent);
+      }
+    }
+    if (root->color == true) 
+    {
+      reColor(root);
+    }
+    return;
+  }
+  else 
+  {//left parent
+    Node* uncle = grandparent->right;
+    if ((uncle != NULL) && (uncle->color == true)) 
+    {//uncle is red
+      leftRedU(c);
+      checkCases(grandparent);
+    }
+    else if (((uncle == NULL) || (uncle->color == false)) && c->parent->color == true) 
+    {//black uncle cases
+      if (c->parent->right == c) 
+      {//c , paremnt right
+        Node * temp = leftRotate(c->parent);
+        checkCases(temp->left);
+      }
+      else
+      {//c is left, parent is left
+        reColor(c->parent);
+        reColor(grandparent);
+        Node * temp = rightRotate(c->parent->parent);
+        checkCases(grandparent);
+      }
+    }
+    if (root->color == true) 
+    {//maintain root
+      reColor(root);
+    }
+    return;
+  }
 }
 void rightRedU(Node*& c)
 {
+  reColor(c->parent);
+  reColor(c->parent->parent);
+  reColor(c->parent->parent->left);
 
 }
 void leftRedU(Node*& c)
 {
-
+  reColor(c->parent);
+  reColor(c->parent->parent);
+  reColor(c->parent->parent->right);
 }
 
-Node* rightRotate(Node* n)
-{
-
-}
-Node* leftRotate (Node* n)
-{
-
-}
