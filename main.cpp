@@ -205,6 +205,7 @@ void fromFile()
   {
     numbers >> n;
     insert(root, n);
+    c++;
   }
 }
 
