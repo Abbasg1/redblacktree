@@ -218,7 +218,7 @@ void fromClient()
 
 
   int loopCount = 0;
-  do
+  while(true)
   {
     
     cin >> inp;
@@ -228,9 +228,26 @@ void fromClient()
       cout << endl;
       loopCount++;
     }
-  } 
-  while(loopCount <50);
-  
+    else
+    {
+      break;
+    }
+  }
+  /*
+    cout << "";
+    int c =0;
+    while(true)
+    {
+      cin>>inp;
+      if(inp !=0)
+      {
+        cout << "\n";
+        insert(root, inp);
+        c++;
+      }
+    }
+
+*/
   
 }
 
