@@ -376,8 +376,8 @@ void checkCases(Node*& c)
       {//c is left, parent is left
         reColor(c->parent);
         reColor(grandparent);
-        Node * temp = rightRotate(c->parent->parent);
-        checkCases(grandparent);
+        Node * temp = rightRotate(grandparent);
+        checkCases(temp);
       }
     }
     if (root->color == true) 
@@ -400,4 +400,3 @@ void leftRedU(Node*& c)
   reColor(c->parent->parent);
   reColor(c->parent->parent->right);
 }
-
