@@ -65,6 +65,10 @@ void print(Node* c, int h);
 void fromFile();
 void fromClient();
 
+//deletion
+void search(Node* c, int n);
+Node* void remove(Node* c, int n);
+
 void reColor(Node*& c);
 void checkCases(Node*& c);
 void rightRedU(Node*& c);
@@ -399,4 +403,21 @@ void leftRedU(Node*& c)
   reColor(c->parent);
   reColor(c->parent->parent);
   reColor(c->parent->parent->right);
+}
+
+void search(Node* c, int n)
+{
+
+}
+
+Node* void remove(Node* c, int n)
+{
+  if(c==nullptr)
+    {
+      return c;
+    }
+  if()
+    {
+
+    }
 }
