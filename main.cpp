@@ -168,7 +168,7 @@ int main()
   while(true)
   {
     int rsp;
-    cout << "1 to insert, 2 to print, 3 to quit";
+    cout << "1 to insert, 2 to print, 3 to search, 4 to delete, 5 to quit";
     cin >> rsp;
     if(rsp == 1)
     {//insert
@@ -185,7 +185,15 @@ int main()
       print(root, 0);
     }
     else if(rsp ==3)
-    {//quit
+    {//search
+      
+    }
+    else if(rsp == 4)
+      {//delete
+
+    }
+    else if(rsp == 5)
+      {//quit
       break;
     }
     else
@@ -413,11 +421,24 @@ void search(Node* c, int n)
 Node* void remove(Node* c, int n)
 {
   if(c==nullptr)
-    {
+  {
       return c;
-    }
-  if()
+  }
+  if(n> c->data)
+  {
+    c->right = remove(c->right, n);
+    return c;
+  }
+  if(n < c->data)
+  {
+    c->left = remove(c->left, n);
+    return c;
+  }
+  else
+  {
+    if()
     {
 
     }
+  }
 }
