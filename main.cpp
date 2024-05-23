@@ -8,7 +8,7 @@ using namespace std;
 Ghazi Abbas
 shs data structures - galbraith
 
-red black tree insertion (part 1)
+red black tree insetion plus deletion, part 2
 
 --using numbers.txt
 
@@ -65,14 +65,25 @@ void print(Node* c, int h);
 void fromFile();
 void fromClient();
 
-//deletion
 void search(Node* c, int n);
-Node* void remove(Node* c, int n);
 
 void reColor(Node*& c);
 void checkCases(Node*& c);
 void rightRedU(Node*& c);
 void leftRedU(Node*& c);
+
+Node* rem(Node* c, int n);
+Node* findNode(int n);
+Node* getSucc(Node* c);
+Node* getSibling(Node* c);
+
+void fixTree(Node* c, Node* p); //p is parent
+void replace(Node*& c, Node*& r);//r is replacement node
+bool isRight(Node* c);
+bool isLeft(Node* c);
+
+
+
 
 
 //need global vriable for be;ow
@@ -168,7 +179,7 @@ int main()
   while(true)
   {
     int rsp;
-    cout << "1 to insert, 2 to print, 3 to search, 4 to delete, 5 to quit";
+    cout << "1 to insert, 2 to print, 3 to search, 4 to remove, 5 to quit";
     cin >> rsp;
     if(rsp == 1)
     {//insert
@@ -186,15 +197,24 @@ int main()
     }
     else if(rsp ==3)
     {//search
-      
+      cout << "enter number to find" << endl;
+      int x;
+      cin >> x;
+      cin.get(); //maybe
+      search(root, x);
     }
-    else if(rsp == 4)
-      {//delete
+    else if(rsp ==4)
+    {//remove
+        cout << "enter number to delete" << endl;
+        int x;
+        cin >> x;
+        cin.get();
+        root = rem(root, x);
 
     }
-    else if(rsp == 5)
-      {//quit
-      break;
+    else if(rsp==5)
+    {
+        break;
     }
     else
     {
@@ -381,14 +401,14 @@ void checkCases(Node*& c)
     {//black uncle cases
       if (c->parent->right == c) 
       {//c , paremnt right
-        Node * temp = leftRotate(c->parent);
+        Node* temp = leftRotate(c->parent);
         checkCases(temp->left);
       }
       else
       {//c is left, parent is left
         reColor(c->parent);
         reColor(grandparent);
-        Node * temp = rightRotate(grandparent);
+        Node* temp = rightRotate(grandparent);
         checkCases(temp);
       }
     }
@@ -413,32 +433,319 @@ void leftRedU(Node*& c)
   reColor(c->parent->parent->right);
 }
 
+Node* rem(Node* c, int n)
+{
+    if(c==nullptr)
+    {
+        return c;
+    }
+    //keep lookinmg
+    if(n > c->data)
+    {
+        c->right = rem(c->right, n);
+        return c;
+    }
+    if(n < c->data)
+    {
+        c->left = rem(c->left, n);
+        return c;
+    }
+    else
+    {
+        if(c->right == nullptr && c->left == nullptr)
+        {
+            if(c == root)
+            {
+                delete c;
+                return nullptr;
+            }
+            if(c->color)//is red
+            {
+                delete c;
+                return nullptr;
+            }
+            else//is black
+            {   
+                Node* temp = c->right;
+                Node* tempParent = c->parent;
+                delete c;
+                fixTree(temp, tempParent);
+                return temp;
+            }
+            return c;
+        }
+        else if(c->left == nullptr)
+        {
+            if(c->color)//is red
+            {
+                Node* temp = c->right;
+                delete c;
+                return temp;
+            }
+            else//is black
+            {
+                if(c->right->color)//red child 
+                {
+                    Node* temp = c->right;
+                    delete c;
+                    temp->color = false;
+                    return temp;
+                }
+                else//db
+                {
+                    Node* temp = c->right;
+                    //Node* tempParent = temp->parent;
+                    delete c;
+                    fixTree(temp, temp->parent);//access here
+                    return temp;
+                }
+            }
+            return c;
+        }
+        else if(c->right == nullptr)
+        {
+            if(c->color)//red
+            {
+                Node* temp = c->left;
+                delete c;
+                return temp;
+            }
+            else//black
+            {
+                if(c->left->color)//if red
+                {
+                    Node* temp = c->left;
+                    delete c;
+                    temp->color = false; //set to black
+                    return temp;
+                }
+                else//another db
+                {
+                    Node* temp = c->left;
+                    delete c;
+                    fixTree(temp, temp->parent);
+                    return temp;
+                }
+
+            }
+            return c;
+        }
+        else
+        {//successor
+            Node* sParent = c;
+            Node* succ = c->left;
+            while(succ->right != nullptr)
+            {
+                sParent = succ;
+                succ = succ->right;
+            }
+            if(sParent != c)
+            {
+                sParent->right = succ->left;
+                if(succ->color == false)
+                {
+                    if(sParent->right != nullptr && sParent->right->color==true)
+                    {
+                        sParent->right->color = false;
+                    }
+                    else
+                    {
+                        fixTree(sParent->right, sParent);
+                    }
+                }
+            }
+            else// c left replaces
+            {
+                sParent->left = succ->left;
+                if(succ->color == false)
+                {
+                    if(sParent -> left != nullptr && sParent->left->color == true)
+                    {
+                        sParent->left->color = false;
+                    }
+                    else
+                    {
+                        fixTree(sParent->left, sParent);
+                    }
+                }
+
+            }
+            c->data = succ->data;
+            delete succ;
+            return c;
+        }
+    }
+    return c;
+}
+Node* findNode(int n)
+{
+    Node* find = root;
+    while (find != NULL && find->data != n) 
+    {
+        if (n < find->data) 
+        {
+            find = find->left;
+        }
+        else
+        {
+            find = find->right;
+        }
+    }
+    return find;
+}
+Node* getSucc(Node* c)
+{
+    while (c->left != NULL) 
+    {
+        c = c->left;
+    }
+
+    return c;
+}
+Node* getSibling(Node* c)
+{
+    if (c->parent->left ==c) 
+    {
+        return c->parent->right;
+    }
+    else 
+    {
+        return c->parent->left;
+    }
+}
+
 void search(Node* c, int n)
 {
-
-}
-
-Node* void remove(Node* c, int n)
-{
-  if(c==nullptr)
-  {
-      return c;
-  }
-  if(n> c->data)
-  {
-    c->right = remove(c->right, n);
-    return c;
-  }
-  if(n < c->data)
-  {
-    c->left = remove(c->left, n);
-    return c;
-  }
-  else
-  {
-    if()
+    if(c==nullptr)
     {
-
+        cout << "Entry not found" << endl;
     }
-  }
+    else if(c->data == n)
+    {
+        cout << "Found!" << endl;
+    }
+    else
+    {
+        if(n > c->data) //use tree properties to traverse
+        {
+            search(c->right, n);
+        }
+        else//traverse other side
+        {
+            search(c->left, n);
+        }
+    }
 }
+void fixTree(Node* c, Node* p)
+{
+    Node* sibling = NULL;
+
+    if (c == root) 
+    {//double-black root
+        return;
+    }
+    else 
+    {
+        if (p->left == c) 
+        {
+            sibling = p->right;
+        }
+        else
+        {
+            sibling = p->left;
+        }
+        if (sibling != NULL) 
+        {
+            if (sibling->color == true && p->color == false) 
+            {//c, p is black, sibling is red
+                sibling->color = false;
+                p->color = true;
+                if (isRight(sibling)) 
+                {
+                    leftRotate(p);
+                }
+                else 
+                {
+                    rightRotate(p);
+                }
+            }
+            if (sibling->color == false && p->color == false && (sibling->left == NULL || sibling->left->color == false) && (sibling->right == NULL || sibling->right->color == false)) 
+            {//sibling, c, p, and sibling's children are b;ack
+                sibling->color = true;
+                fixTree(p, p->parent);
+            }
+            else if (p->color == true && sibling->color == false && (sibling->left == NULL || sibling->left->color == false) && (sibling->right == NULL || sibling->right->color == false)) 
+            {//parent node red both siblings balck
+                p->color = false;
+                sibling->color = true;
+                return;
+            }
+            else if (isLeft(sibling) && sibling->color == false && (sibling->left == NULL || sibling->left->color == false) && sibling->right != NULL && sibling->right->color == true) 
+            {//sibling and its left child are black, S right child is red, and C is right
+                sibling->color = true;
+                sibling->right->color = false;
+                leftRotate(sibling);
+            }
+            else if (isRight(sibling) && sibling->color == false && (sibling->right == NULL || sibling->right->color == false) && sibling->left != NULL && sibling->left->color == true) 
+            {//sibling and right child are black, left child is red, and C is left
+                sibling->color = true;
+                sibling->left->color = false;
+                rightRotate(sibling);
+            }
+            if (sibling->color == false && isLeft(sibling) && sibling->left != NULL && sibling->left->color == true) 
+            {//sibling is black, S left child is red, and C is black
+                sibling->color = p->color;
+                p->color = false;
+                rightRotate(p);
+                return;
+            }
+            else if (sibling->color == false&& isRight(sibling) && sibling->right != NULL && sibling->right->color == true) 
+            {//s is black, s right child is red, and current is black
+                sibling->color = p->color;
+                p->color = false;
+                leftRotate(p);
+                return;
+            }
+        }
+    }
+
+}
+
+void replace(Node*& c, Node*& r)
+{
+    if (c->parent == NULL) 
+    {
+        root = r;
+    }
+    else if (c == c->parent->left) 
+    {
+        c->parent->left = r;
+    }
+    else 
+    {
+        c->parent->right = r;
+    }
+
+    if (r != NULL) 
+    {
+        r->parent = c->parent;
+    }
+}
+bool isRight(Node* c)
+{
+    if (c->parent->right == c) 
+    {
+        return true;
+    }
+    return false;
+}
+bool isLeft(Node* c)
+{
+    if(c->parent->left == c)
+    {
+        return true;
+    }
+    return false;
+}
+
+
